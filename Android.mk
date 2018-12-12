@@ -1,7 +1,5 @@
 LOCAL_PATH := $(call my-dir)
 
-ifeq ($(call is-vendor-board-platform,QCOM),true)
-
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_RELATIVE_PATH := hw
@@ -92,9 +90,7 @@ ifeq ($(call is-board-platform-in-list,msm8998 apq8098_latv), true)
 LOCAL_SRC_FILES += power-8998.c
 endif
 
-ifeq ($(call is-board-platform-in-list,sdm660), true)
 LOCAL_SRC_FILES += power-660.c
-endif
 
 ifeq ($(call is-board-platform-in-list,sdm845), true)
 LOCAL_SRC_FILES += power-845.c
@@ -154,7 +150,4 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_VENDOR_MODULE := true
 
 include $(BUILD_EXECUTABLE)
-endif
-
-
 endif
