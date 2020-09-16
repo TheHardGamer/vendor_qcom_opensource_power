@@ -211,21 +211,7 @@ int is_schedutil_governor(char* governor) {
     return 0;
 }
 
-#ifndef INTERACTION_BOOST
 void interaction(int UNUSED(duration), int UNUSED(num_args), int UNUSED(opt_list[])) {
-#else
-void interaction(int duration, int num_args, int opt_list[]) {
-    static int lock_handle = 0;
-
-    if (duration < 0 || num_args < 1 || opt_list[0] == 0) return;
-
-    if (qcopt_handle) {
-        if (perf_lock_acq) {
-            lock_handle = perf_lock_acq(lock_handle, duration, opt_list, num_args);
-            if (lock_handle == -1) ALOGE("Failed to acquire lock.");
-        }
-    }
-#endif
 }
 
 int interaction_with_handle(int lock_handle, int duration, int num_args, int opt_list[]) {
@@ -234,7 +220,6 @@ int interaction_with_handle(int lock_handle, int duration, int num_args, int opt
     if (qcopt_handle) {
         if (perf_lock_acq) {
             lock_handle = perf_lock_acq(lock_handle, duration, opt_list, num_args);
-            if (lock_handle == -1) ALOGE("Failed to acquire lock.");
         }
     }
     return lock_handle;
@@ -250,7 +235,6 @@ int perf_hint_enable(int hint_id, int duration) {
     if (qcopt_handle) {
         if (perf_hint) {
             lock_handle = perf_hint(hint_id, pkg, duration, -1);
-            if (lock_handle == -1) ALOGE("Failed to acquire lock for hint_id: %X.", hint_id);
         }
     }
     return lock_handle;
@@ -264,7 +248,6 @@ int perf_hint_enable_with_type(int hint_id, int duration, int type) {
     if (qcopt_handle) {
         if (perf_hint) {
             lock_handle = perf_hint(hint_id, NULL, duration, type);
-            if (lock_handle == -1) ALOGE("Failed to acquire lock.");
         }
     }
     return lock_handle;
@@ -280,7 +263,6 @@ int perform_hint_action(int hint_id, int resource_values[], int num_resources) {
         int lock_handle = perf_lock_acq(0, 0, resource_values, num_resources);
 
         if (lock_handle == -1) {
-            ALOGE("Failed to acquire lock.");
             return -EINVAL;
         }
 
@@ -290,7 +272,6 @@ int perform_hint_action(int hint_id, int resource_values[], int num_resources) {
         if (!new_hint) {
             /* Can't keep track of this lock. Release it. */
             if (perf_lock_rel) perf_lock_rel(lock_handle);
-            ALOGE("Failed to process hint.");
             return -ENOMEM;
         }
 
@@ -306,7 +287,6 @@ int perform_hint_action(int hint_id, int resource_values[], int num_resources) {
             free(new_hint);
             /* Can't keep track of this lock. Release it. */
             if (perf_lock_rel) perf_lock_rel(lock_handle);
-            ALOGE("Failed to process hint.");
             return -ENOMEM;
         }
     }
